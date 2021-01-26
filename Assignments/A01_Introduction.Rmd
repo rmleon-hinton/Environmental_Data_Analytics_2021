@@ -1,6 +1,6 @@
 ---
 title: "Assignment 1: Introduction"
-author: "Student Name"
+author: "Reed Leon-Hinton"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -22,21 +22,20 @@ The completed exercise is due on <>.
 
 1. What are your previous experiences with data analytics, R, and Git? Include both formal and informal training.
 
-> Answer: 
+> Answer: I have taken multiple courses that have dealt in data analytics and R, two with Luana (Time Series and Economics of Modern Power Systems) and the general statistics course required for all Nicholas School Students. 
 
 2. Are there any components of the course about which you feel confident?
 
-> Answer: 
+> Answer: The Time Series section should be generally things I already understand, as I took the course with Luana. Also, the usage of R is something I feel relatively confident regarding. 
 
 3. Are there any components of the course about which you feel apprehensive?
 
-> Answer: 
+> Answer: The usage of Git is new to me and caused me some issues regarding this first assignment. I linked the wrong repository, trying to add the non-forked one to R Studio. It let me add it but then wouldn't let me change/push any files.
 
 
 ## 2) GitHub
 
 Provide a link below to your forked course repository in GitHub. Make sure you have pulled all recent changes from the course repository  and that you have updated your course README file. 
 
-> Answer: 
-
+> Answer: https://github.com/rmleon-hinton/Environmental_Data_Analytics_2021.git
 
