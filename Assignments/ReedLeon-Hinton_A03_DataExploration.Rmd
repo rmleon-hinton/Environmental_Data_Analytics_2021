@@ -266,11 +266,17 @@ Why is the boxplot a more effective visualization option than the violin plot in
 What type(s) of litter tend to have the highest biomass at these sites? 
 
 > Answer: The three highest biomass types of litter based upon the median values are the: 
+
 > "Needles" - 2.2850
+
 > "Mixed" - 0.6100
+
 > "Twigs/branches" - 0.0550
 
 > If you look at mean, you see the following:
+
 > "Needles" - 2.7050
+
 > "Mixed" - 0.9650
+
 > "Twigs/branches" - 0.6230
