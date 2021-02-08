@@ -123,6 +123,7 @@ class(Neonics$Conc.1..Author.)
 
 ```
 
+
 > Answer: The Conc.1..Author variable is non-numeric and, instead, is a character class. This is because the data in the column was not cleanly formatted when reported. There are some "/" and "NR" values within the column which caused R to import them as a character class rather than a numeric class. 
 
 
