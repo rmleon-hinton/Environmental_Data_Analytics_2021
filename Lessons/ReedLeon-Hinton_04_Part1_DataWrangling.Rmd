@@ -19,7 +19,7 @@ Today we will work with a dataset from the [North Temperate Lakes Long-Term Ecol
 
 Opening discussion: why might we be interested in long-term observations of temperature, oxygen, and light in lakes?
 
-> Add notes here: 
+> Add notes here: They will affect the population of creatures within the lake and could indicate overall species trends if similar conditions are found in other lakes. 
 
 ```{r, message = FALSE}
 getwd()
@@ -37,7 +37,10 @@ dim(NTL.phys.data)
 
 class(NTL.phys.data$sampledate)
 # Format sampledate as date
-NTL.phys.data$sampledate <- as.Date(NTL.phys.data$sampledate, format = "%m/%d/%y")
+#NTL.phys.data$sampledate <- as.Date(NTL.phys.data$sampledate, format = "%m/%d/%y")
+
+#added an area for doing this operation with lubridate instead
+NTL.phys.data$sampledate <- mdy(NTL.phys.data$sampledate)
 ```
 
 ## Data Wrangling
@@ -63,14 +66,14 @@ vignette("dplyr")
 Filtering allows us to choose certain rows (observations) in our dataset.
 
 Here are the relevant commands used in the `filter` function. Add some notes to designate what these commands mean. 
-`==`
+`==` - comparing to a specific value
 `!=`
-`<`
+`<` 
 `<=`
 `>`
 `>=`
-`&`
-`|`
+`&` - between multiple conditions
+`|` - one or the other is true
 
 ```{r}
 class(NTL.phys.data$lakeid)
