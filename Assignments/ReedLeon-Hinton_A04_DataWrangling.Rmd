@@ -1,6 +1,6 @@
 ---
 title: "Assignment 4: Data Wrangling"
-author: "Student Name"
+author: "Reed Leon-Hinton"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -24,7 +24,13 @@ The completed exercise is due on Tuesday, Feb 16 @ 11:59pm.
 2. Explore the dimensions, column names, and structure of the datasets. 
 
 ```{r, message = FALSE}
-#1
+#1 Setting up the working directory and loading the required packages
+getwd()
+
+# install.packages("tidyverse")
+library(tidyverse)
+# install.packages("lubridate")
+library(lubridate)
 
 #2
 ```
