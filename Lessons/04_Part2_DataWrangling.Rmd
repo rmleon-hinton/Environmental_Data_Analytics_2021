@@ -17,6 +17,8 @@ editor_options:
 
 ```{r, message = FALSE}
 getwd()
+# clearing the environment (It's a pet peeve)
+remove(list = ls())
 library(plyr)
 library(tidyverse)
 library(lubridate)

@@ -27,12 +27,52 @@ The completed exercise is due on Tuesday, Feb 16 @ 11:59pm.
 #1 Setting up the working directory and loading the required packages
 getwd()
 
+# clearing the environment (It's a pet peeve)
+remove(list = ls())
+
 # install.packages("tidyverse")
 library(tidyverse)
 # install.packages("lubridate")
 library(lubridate)
 
-#2
+# importing the datasets
+o3_2018 <- read.csv(file = "./Data/Raw/EPAair_O3_NC2018_raw.csv", 
+                    stringsAsFactors = TRUE)
+o3_2019 <- read.csv(file = "./Data/Raw/EPAair_O3_NC2019_raw.csv", 
+                    stringsAsFactors = TRUE)
+pm25_2018 <- read.csv(file = "./Data/Raw/EPAair_PM25_NC2018_raw.csv", 
+                      stringsAsFactors = TRUE)
+pm25_2019 <- read.csv(file = "./Data/Raw/EPAair_PM25_NC2019_raw.csv", 
+                      stringsAsFactors = TRUE)
+
+#2 looking at the details of the datasets
+
+# looking at the O3 2018 dataset
+dim_o3_2018 <- dim(o3_2018)
+colnames(o3_2018)
+summary(o3_2018)
+lapply(o3_2018, class)
+
+# looking at the O3 2019 dataset
+dim_o3_2019 <- dim(o3_2019)
+colnames(o3_2019)
+summary(o3_2019)
+lapply(o3_2019, class)
+
+
+# looking at the PM 2.5 2018 dataset
+dim_pm25_2018 <- dim(pm25_2018)
+colnames(pm25_2018)
+summary(pm25_2018)
+lapply(pm25_2018, class)
+
+
+# looking at the PM 2.5 2019 dataset
+dim_pm25_2019 <- dim(pm25_2019)
+colnames(pm25_2019)
+summary(pm25_2019)
+lapply(pm25_2019, class)
+
 ```
 
 ## Wrangle individual datasets to create processed files.
@@ -42,13 +82,39 @@ library(lubridate)
 6. Save all four processed datasets in the Processed folder. Use the same file names as the raw files but replace "raw" with "processed".
 
 ```{r}
-#3
+#3 changing the format of the date column in each dataset
+o3_2018$Date <- mdy(o3_2018$Date)
+o3_2019$Date <- mdy(o3_2019$Date)
+pm25_2018$Date <- mdy(pm25_2018$Date)
+pm25_2019$Date <- mdy(pm25_2019$Date)
 
-#4
+#4 creating processed datasets with the selected columns only
+o3_2018_p <- select(.data = o3_2018,
+                    Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, 
+                    COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+o3_2019_p <- select(.data = o3_2019,
+                    Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, 
+                    COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+pm25_2018_p <- select(.data = pm25_2018,
+                      Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, 
+                      COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+pm25_2019_p <- select(.data = pm25_2019,
+                      Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, 
+                      COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
-#5
+#5 setting the value of the AQS_PARAMETER_DESC column to PM2.5
+pm25_2018_p$AQS_PARAMETER_DESC <- as.factor("PM2.5")
+pm25_2019_p$AQS_PARAMETER_DESC <- as.factor("PM2.5")
 
-#6
+#6 creating the processed datasets in the processed folder
+write.csv(o3_2018_p, row.names = FALSE,
+          file = "./Data/Processed/EPAair_O3_NC2018_processed.csv")
+write.csv(o3_2019_p, row.names = FALSE,
+          file = "./Data/Processed/EPAair_O3_NC2019_processed.csv")
+write.csv(pm25_2018_p, row.names = FALSE,
+          file = "./Data/Processed/EPAair_PM25_NC2018_processed.csv")
+write.csv(pm25_2019_p, row.names = FALSE,
+          file = "./Data/Processed/EPAair_PM25_NC2019_processed.csv")
 
 ```
 
@@ -67,15 +133,41 @@ library(lubridate)
 11. Save your processed dataset with the following file name: "EPAair_O3_PM25_NC1718_Processed.csv"
 
 ```{r}
-#7
+#7 combining the datasets with the rbind function
+o3_pm25_p <- rbind(o3_2018_p, o3_2019_p, pm25_2018_p, pm25_2019_p)
 
-#8
+#8 completing the pipe function to meet the conditions specified
+o3_pm25_p <- o3_pm25_p %>%
+  filter(Site.Name %in% c("Linville Falls", "Durham Armory", "Leggett", 
+                          "Hattie Avenue", "Clemmons Middle", "Mendenhall School", 
+                          "Frying Pan Mountain", "West Johnston Co.", 
+                          "Garinger High School", "Castle Hayne", "Pitt Agri. Center", 
+                          "Bryson City", "Millbrook School")) %>%
+  group_by(Date, Site.Name, AQS_PARAMETER_DESC, COUNTY) %>%
+  summarise_at(vars(DAILY_AQI_VALUE, SITE_LATITUDE, SITE_LONGITUDE), list(name = mean)) %>%
+  mutate(Month = month(Date, label = TRUE, abbr = TRUE)) %>%
+  mutate(Year = year(Date)) %>%
+  ungroup() %>%
+  droplevels()
+dim(o3_pm25_p) #just checking to see if I got the 14,752 x 9.
 
-#9
+#9 spreading the dataset
+o3_pm25_p <- pivot_wider(o3_pm25_p, names_from = AQS_PARAMETER_DESC, 
+                         values_from = DAILY_AQI_VALUE_name)
 
-#10
+colnames(o3_pm25_p)[4] <- "SITE_LATITUDE" # fixing the unusual naming resulting from the 
+                                          # process where I meaned the values
+
+colnames(o3_pm25_p)[5] <- "SITE_LONGITUDE" # doing the same as above
+
+#10 looking at the dimensions of the dataset
+final_dimensions <- dim(o3_pm25_p)
+print(paste("The final dataset has", final_dimensions[1], "recorded values for", 
+            final_dimensions[2], "variables."))
 
 #11
+write.csv(o3_pm25_p, row.names = FALSE,
+          file = "./Data/Processed/EPAair_O3_PM25_NC1718_Processed.csv")
 
 ```
 
@@ -86,14 +178,26 @@ library(lubridate)
 13. Call up the dimensions of the summary dataset.
 
 ```{r}
-#12a
+#12
+o3_pm25_p_summaries <- 
+  o3_pm25_p %>%
+  group_by(Site.Name, Month, Year) %>%
+  summarise_at(vars(PM2.5, Ozone), list(name = mean)) %>%
+  drop_na(Month, Year) %>%
+  ungroup()
 
-#12b
+# fixing the naming convention like I did previously in the assignment
+colnames(o3_pm25_p)[4] <- "PM2.5"
+colnames(o3_pm25_p)[5] <- "Ozone"
 
-#13
+#13 
+summary_dimensions <- dim(o3_pm25_p_summaries)
+print(paste("The summary dataset has", summary_dimensions[1], "recorded values for", 
+            summary_dimensions[2], "variables."))
+
 
 ```
 
 14. Why did we use the function `drop_na` rather than `na.omit`?
 
-> Answer: 
+> Answer: na.omit drops all values which have NA associated with every row, whereas drop_na only drops rows with NA values from the columns specified. We get many 207 more observations when we use drop_na rather than na.omit. drop_na works better in this situation because we want to keep the NA values for Ozone and PM2.5, but not for the month and year. 
