@@ -19,6 +19,9 @@ editor_options:
 The expression function can be used when you want to add mathematical symbols and subscripts mixed with regular letter to labels. 
 
 ```{r}
+# clearing the environment (It's a pet peeve)
+remove(list = ls())
+
 Plot_text <-
 ggplot(data=data.frame(x=0,y=0))+
   geom_point(aes(x=x,y=y)) +
@@ -60,6 +63,16 @@ Exercise: build your own scatterplots of PeterPaul.chem.nutrients
 # Color your points by year, and facet by lake in two rows.
 # Change the ylab name
 
+PeterPaul.surface <- 
+  PeterPaul.chem.nutrients %>%
+  filter(depth == 0) %>%
+  drop_na(temperature_C)
+
+ggplot(PeterPaul.surface, aes(x = daynum, y = temperature_C, colour = year4)) + 
+  geom_point() +
+  ylab("Temperature (C)") +
+  xlab("Day of the Year") +
+  facet_wrap(vars(lakename), nrow = 2)
 
 #2. 
 # Plot temperature by date. Color your points by depth.
@@ -67,7 +80,11 @@ Exercise: build your own scatterplots of PeterPaul.chem.nutrients
 # Change the color palette to magma and play with direction (+- 1), which one makes more sense?
 # Change x axis to include marker/labels every 5 years
 
-
+ggplot(PeterPaul.chem.nutrients, aes(x = sampledate, y = temperature_C, colour = depth)) + 
+  geom_point(size = 0.5) +
+  ylab("Temperature (C)") +
+  xlab("Date") +
+  scale_color_viridis(option = "magma", direction = -1) # -1 makes more sense because it gets darker as it gets deeper. 
 
 
 ```
@@ -82,7 +99,12 @@ Exercise: Plot relationships between air quality measurements
 # Make the points 50 % transparent
 # Add a line of best fit for the linear regression of these variables.
 
-
+ggplot(EPAair, aes(x = PM2.5, y = Ozone, colour = SITE_LATITUDE)) + 
+  geom_point(size = 0.5, alpha = 0.5) +
+  
+  geom_smooth(method = lm) +
+  ylab("Ozone") +
+  xlab("PM 2.5")
 
 
 ```
