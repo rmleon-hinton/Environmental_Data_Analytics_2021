@@ -78,7 +78,7 @@ mytheme <- theme_classic(base_size = 14) +
 
 O3plot5 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone)) +
-  mytheme
+  super_cool_theme
 print(O3plot5)  
 
 theme_set(mytheme)
