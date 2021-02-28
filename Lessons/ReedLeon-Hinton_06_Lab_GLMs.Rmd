@@ -20,11 +20,14 @@ editor_options:
 library(tidyverse)
 library(agricolae)   
 
+# clearing the environment (It's a pet peeve)
+remove(list = ls())
+
 PeterPaul.chem.nutrients <- read.csv("./Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv", stringsAsFactors = TRUE)
 # Set date to date format
 PeterPaul.chem.nutrients$sampledate <- as.Date(PeterPaul.chem.nutrients$sampledate, format = "%Y-%m-%d")
 
-EPAair <- read.csv("./Data/Processed/EPAair_O3_PM25_NC1819_Processed.csv", stringsAsFactors = TRUE)
+EPAair <- read.csv("./Data/Processed/EPAair_O3_PM25_NC1718_Processed.csv", stringsAsFactors = TRUE)
 # Set date to date format
 EPAair$Date <- as.Date(EPAair$Date, format = "%Y-%m-%d")
 
@@ -66,7 +69,8 @@ Are Ozone levels below the threshold for "good" AQI index (0-50)?
 
 > Exercise 1: State the hypotheses for testing mean of AQI index.
 
-> Answer: 
+> Answer: null = The mean ozone level greater than or equal to 50 on the AQI index.
+          alternative = The mean ozone level is less than 50 on the AQI index. 
 
 
 ```{r}
@@ -148,7 +152,15 @@ Create three plots, each with appropriately formatted axes and legends. Choose a
 3. geom_violin of ozone divided by year, with the 0.5 quantile marked as a horizontal line. Add letters representing a significant difference between 2018 and 2019. 
 
 ```{r}
+EPAair$Year <- as.factor(EPAair$Year)
+
 #Exercise 2:
+ggplot(EPAair, aes(x = Ozone, fill = Year)) + 
+  geom_density(alpha = 0.5)
+
+ggplot(EPAair, aes(x = Year, y = Ozone, color = Year)) +
+  geom_boxplot()+
+  stat_summary()
 
 
 ```
@@ -163,10 +175,15 @@ For the NTL-LTER dataset, can we predict PM2.5 from Ozone?
 
 #Exercise 3: Run a linear regression PM2.5 by Ozone. Find the p-value and R-squared value. 
 
+ln_exercise_3 <- lm(data = EPAair, PM2.5 ~ Ozone)
+summary(ln_exercise_3)
 
 
 #Exercise 4: Build a scatterplot. Add a line and standard error for the linear regression. Add the regression equation to the plot
 
+ggplot(EPAair, aes(x = PM2.5, y = Ozone)) + 
+  geom_point(alpha = 0.5) + 
+  geom_smooth(method = "lm", se = TRUE, color = "orange")
 
 
 ```
