@@ -137,7 +137,7 @@ GaringerOzone$DAILY_AQI_VALUE <- zoo::na.approx(GaringerOzone$DAILY_AQI_VALUE)
 
 ```
 
-> Answer: With daily data, using the Piecewise Constant option would simply skew the trend as it would be equidistant from the measured data points on either side of the missing observation. Spline interpolation is can also lead to greater variance than linear interpolation as the quadratic element changes the resulting filled spots more than a linear interpolation. 
+> Answer: With daily data, using the Piecewise Constant option would simply skew the trend as it would be equidistant from the measured data points on either side of the missing observation. Spline interpolation is also an inferior choice since it can also lead to greater variance than linear interpolation as the quadratic element changes the resulting filled spots more than a linear interpolation. A linear trend is also most accurate for this function as we know that the data points throughout are evenly spaced between each day's measurement point surrounding it. 
 
 
 9. Create a new data frame called `GaringerOzone.monthly` that contains aggregated data: mean ozone concentrations for each month. In your pipe, you will need to first add columns for year and month to form the groupings. In a separate line of code, create a new Date column with each month-year combination being set as the first day of the month (this is for graphing purposes only)
@@ -211,7 +211,7 @@ summary(Ozone_monthly_smk)
 
 ```
 
-> Answer: There is a clear seasonality to the Ozone data, both daily and monthly, with the observations in ozone concentration. The usage of the seasonal MK test allows us to account for the seasonality and works for non-parametric data.
+> Answer: There is a clear seasonality to the Ozone data, both daily and monthly, with the observations in ozone concentration. The usage of the seasonal MK test allows us to account for the seasonality and works for non-parametric data. 
 
 13. Create a plot depicting mean monthly ozone concentrations over time, with both a geom_point and a geom_line layer. Edit your axis labels accordingly.
 
