@@ -1,6 +1,6 @@
 ---
 title: "Assignment 9: Spatial Analysis in R"
-author: "Student Name"
+author: "Reed Leon-Hinton"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -30,10 +30,17 @@ This exercise accompanies the lessons in Environmental Data Analytics (ENV872L) 
 
 ```{r Prepare workspace}
 #1.
+# examining the working directory
+getwd()
 
+# clearing the environment (It's a pet peeve)
+remove(list = ls())
 
-#2. 
-
+#2.importing libraries
+library(tidyverse)
+library(sf)
+library(leaflet)
+library(mapview)
 
 ```
 
