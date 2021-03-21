@@ -30,6 +30,11 @@ This exercise accompanies the lessons in Environmental Data Analytics (ENV872L) 
 
 ```{r Prepare workspace}
 #1.
+# clearing the console and plots so looking at the code when ran
+# from start to finish is cleaner.
+cat("\f")
+graphics.off()
+
 # examining the working directory
 getwd()
 
@@ -129,7 +134,8 @@ colnames(gage_loc_sf)
 #13. Plot the gage locations atop the county features
 #Plot
 ggmap = ggplot() + 
-  geom_sf(data = gage_loc_sf) +
+  geom_sf(data = counties_sf, alpha = 0.5) + 
+  geom_sf(data = gage_loc_sf, color = "blue") +
   labs(title = "NWIS Gage Locations in Nebraska", subtitle = "Reed Leon-Hinton")
 ggmap
 
@@ -178,7 +184,11 @@ Now we can examine where the flooding appears most acute by visualizing gage hei
 height_map  <- mapview(gage_full, 
                      layer.name = "Gage Height",
                      zcol = "gage_ht",
-                     cex = "gage_ht")
+                     cex = "gage_ht") +
+  mapview(counties_sf, 
+        col.regions = "gray", 
+        layer.name = "Nebraska counties", 
+        alpha.regions = 0.5, color = "white")
 height_map
 
 #ggplot
