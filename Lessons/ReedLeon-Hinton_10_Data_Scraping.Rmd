@@ -15,6 +15,14 @@ editor_options:
 
 ## Set up
 ```{r, message = FALSE}
+# clearing the console and plots so looking at the code when ran
+# from start to finish is cleaner.
+cat("\f")
+graphics.off()
+
+# clearing the environment (It's a pet peeve)
+remove(list = ls())
+
 getwd()
 library(tidyverse)
 library(lubridate)
