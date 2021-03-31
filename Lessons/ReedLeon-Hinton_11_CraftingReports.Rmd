@@ -84,6 +84,12 @@ Create a table below that details the example datasets we have been using in cla
 
 Create an R chunk below that installs the package `knitr`. Instead of commenting out the code, customize the chunk options such that the code is not evaluated (i.e., not run).
 
+```{r Install_Packages_Chunk, eval=FALSE, include=FALSE}
+install.packages("knitr")
+install.packages("lubridate")
+install.packages("tidyverse")
+```
+
 
 ### Setup
 
@@ -93,6 +99,29 @@ Load the NTL-LTER_Lake_Nutrients_Raw dataset, display the head of the dataset, a
 
 Customize the chunk options such that the code is run but is not displayed in the final document.
 
+```{r setup, include=FALSE}
+getwd()
+
+library(knitr)
+library(tidyverse)
+library(lubridate)
+
+super_cool_theme_mk3 <- theme_classic(base_size = 13) +
+  theme(axis.text = element_text(color = "firebrick3"), 
+        legend.position = "top",
+        axis.title = element_text(color = "black"),
+        panel.background = element_rect(fill = "white", color = "black"),
+        panel.grid.major = element_line(size = 0.5, color = "gray93"))
+theme_set(super_cool_theme_mk3)
+
+NTL_LTER_data <- read.csv("../Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv", stringsAsFactors = TRUE)
+
+head(NTL_LTER_data)
+
+NTL_LTER_data$sampledate <- mdy(NTL_LTER_data$sampledate)
+
+```
+
 
 ### Data Exploration, Wrangling, and Visualization
 
@@ -101,6 +130,16 @@ Create an R chunk below to create a processed dataset do the following operation
 -   Include all columns except lakeid, depth_id, and comments
 -   Include only surface samples (depth = 0 m)
 -   Drop rows with missing data
+
+```{r data_processing, echo=FALSE}
+
+NTL_LTER_processed <- NTL_LTER_data %>%
+    select(lakename:sampledate, depth:po4) %>%
+    filter(depth == 0)
+    
+
+```
+
 
 Create a second R chunk to create a summary dataset with the mean, minimum, maximum, and standard deviation of total nitrogen concentrations for each lake. Create a second summary dataset that is identical except that it evaluates total phosphorus. Customize the chunk options such that the code is run but not displayed in the final document.
 
