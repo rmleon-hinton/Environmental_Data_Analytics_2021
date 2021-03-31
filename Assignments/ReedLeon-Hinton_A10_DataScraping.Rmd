@@ -1,6 +1,6 @@
 ---
 title: "Assignment 10: Data Scraping"
-author: "Student Name"
+author: "Reed Leon-Hinton"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -29,10 +29,35 @@ The completed exercise is due on Tuesday, April 6 at 11:59 pm.
 * Load the packages `tidyverse`, `rvest`, and any others you end up using.
 * Set your ggplot theme
 
-```{r, message = FALSE}
+```{r reeds-clearing-code}
+# clearing the environment (It's a pet peeve)
+remove(list = ls())
+
+# clearing the console and plots so looking at the code when ran
+# from start to finish is cleaner.
+graphics.off()
+cat("\f")
+
+```
+
+```{r setup, message = FALSE}
 #1
 
+# checking the working directory
+getwd()
 
+# adding the necessary packages to the library
+library(tidyverse)
+library(rvest)
+
+# the ever-classic making a comeback
+super_cool_theme_mk3 <- theme_classic(base_size = 13) +
+  theme(axis.text = element_text(color = "firebrick3"), 
+        legend.position = "top",
+        axis.title = element_text(color = "black"),
+        panel.background = element_rect(fill = "white", color = "black"),
+        panel.grid.major = element_line(size = 0.5, color = "gray93"))
+theme_set(super_cool_theme_mk3)
 ```
 
 2. We will be scraping data from the NC DEQs Local Water Supply Planning website, specifically the Durham's 2019 Municipal Local Water Supply Plan (LWSP): 
@@ -44,8 +69,9 @@ The completed exercise is due on Tuesday, April 6 at 11:59 pm.
 Indicate this website as the as the URL to be scraped. 
 
 ```{r set.the.scraping.website}
-#2
-
+#2 setting the scraping URL
+theURL <- 'https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2019'
+webpage <- read_html(theURL)
 
 ```
 
@@ -64,6 +90,39 @@ In the code chunk below scrape these values into the supplied variable names.
 ```{r scrape.the.data}
 #3
 
+# scraping the Water System Name
+water_sys_name <- webpage %>% 
+  html_nodes("div+ table tr:nth-child(1) td:nth-child(2)") %>% 
+  html_text()
+water_sys_name
+
+# scraping the PSWID
+pswid <- webpage %>% 
+  html_nodes("td tr:nth-child(1) td:nth-child(5)") %>% 
+  html_text()
+pswid
+
+# scraping the Ownership
+ownership <- webpage %>% 
+  html_nodes("div+ table tr:nth-child(2) td:nth-child(4)") %>% 
+  html_text()
+ownership
+
+# scraping the Maximum monthly withdrawals (MGD)
+mgd <- webpage %>% 
+  html_nodes("th~ td+ td") %>% 
+  html_text() %>%
+  as.numeric()
+mgd
+
+# scraping the ordered months for creation of the dataframe
+month <- webpage %>% 
+  html_nodes(".fancy-table:nth-child(31) tr+ tr th") %>% 
+  html_text()
+month
+# fun fact, this is the only field for which the "tag" changes between pages!
+# therefore, you cannot use this in the function creation later,
+# which I learned after many errors... Just an FYI
 
 ```
 
@@ -77,11 +136,29 @@ In the code chunk below scrape these values into the supplied variable names.
 ```{r create.a.dataframe.from.scraped.data}
 #4
 
+# creating the year column
+year <- 2019
 
+# creating a day column in order for the date to work
+day <- 1
+
+# creating the data frame
+durham_water <- data.frame(water_sys_name, pswid, ownership, 
+                           mgd, month, year, day)
+durham_water$date <- as.Date(with(durham_water, paste(year, month, day, sep = "-")),"%Y-%b-%d")
+
+# removing the unnecessary columns
+durham_water <- 
+  durham_water %>%
+  select(date, month, water_sys_name, pswid, ownership, mgd)
 
 #5
-
-
+mgd_graph <- ggplot(data = durham_water, aes(x = date, y = mgd)) +
+  geom_line() + 
+  geom_point() + 
+  geom_text(aes(label = month), position = position_nudge(y = 1)) +
+  labs(y = "Maximum monthly withdrawals (MGD)", x = "Month", title = "Monthly Maximum Daily Withdrawal in 2019")
+mgd_graph
 
 ```
 
@@ -89,8 +166,39 @@ In the code chunk below scrape these values into the supplied variable names.
 
 ```{r construct.a.scraping.function}
 #6.
+water_scrape <- function(pwsid, Year){
 
+  theURL <- paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=', pwsid, '&year=', Year)
+  website <- read_html(theURL)
+  
+  water_sys_name_tag <- "div+ table tr:nth-child(1) td:nth-child(2)"
+  pwsid_tag <- "td tr:nth-child(1) td:nth-child(5)"
+  ownership_tag <- "div+ table tr:nth-child(2) td:nth-child(4)"
+  mgd_tag <- "th~ td+ td"
 
+  water_sys_name <- website %>% html_nodes(water_sys_name_tag) %>% html_text()
+  pwsid <- website %>% html_nodes(pwsid_tag) %>%  html_text()
+  ownership <- website %>% html_nodes(ownership_tag) %>% html_text()
+  mgd <- website %>% html_nodes(mgd_tag) %>% html_text() %>% as.numeric()
+
+  month <- c("Jan","May","Sep","Feb","Jun","Oct","Mar","Jul","Nov","Apr","Aug","Dec")
+  
+  day <- 1
+  
+  water <- data.frame(water_sys_name, pwsid, ownership, 
+                           mgd, month, Year, day)
+  water$date <- as.Date(with(water, paste(Year, month, day, sep = "-")),"%Y-%b-%d")
+
+  water <- water %>%
+  select(date, month, water_sys_name, pwsid, ownership, mgd)
+  
+  #Return the dataframe
+  return(water)
+}
+
+# testing the function to see if it can replicate what we did before
+water_scrape("03-32-010", "2019")
+durham_water
 
 ```
 
@@ -98,15 +206,32 @@ In the code chunk below scrape these values into the supplied variable names.
 
 ```{r fetch.and.plot.Durham.2015.data}
 #7
+durham_2015 <- water_scrape("03-32-010", "2015")
 
+mgd2015_graph <- ggplot(data = durham_2015, aes(x = date, y = mgd)) +
+  geom_line() + 
+  geom_point() + 
+  geom_text(aes(label = month), position = position_nudge(y = 1)) +
+  labs(y = "Maximum monthly withdrawals (MGD)", x = "Month", title = "Monthly Maximum Daily Withdrawal in 2015")
+mgd2015_graph
 
 ```
 
 8. Use the function above to extract data for Asheville (PWSID = 01-11-010) in 2015. Combine this data with the Durham data collected above and create a plot that compares the Asheville to Durham's water withdrawals.
 
-```{r fetch.and.plot.Durham.2015.data}
+```{r fetch.and.plot.Asheville.2015.data}
 #8
+asheville_2015 <- water_scrape("01-11-010", "2015")
 
+water_2015 <- rbind(durham_2015, asheville_2015)
+
+water2015_graph <- ggplot(data = water_2015, aes(x = date, y = mgd, color = water_sys_name)) +
+  geom_line() + 
+  geom_point() + 
+  geom_text(aes(label = month), position = position_nudge(y = 1)) +
+  labs(y = "Maximum monthly withdrawals (MGD)", x = "Month", title = "Monthly Maximum Daily Withdrawal Comparison in 2015") +
+  theme(legend.title = element_blank(), legend.position = "bottom")
+water2015_graph
 
 ```
 
@@ -116,7 +241,36 @@ In the code chunk below scrape these values into the supplied variable names.
 ```{r}
 #9
 
+# could do it this way, but below I do it a slightly different way
+# asheville_2010 <- water_scrape("01-11-010", "2010")
+# asheville_2011 <- water_scrape("01-11-010", "2011")
+# asheville_2012 <- water_scrape("01-11-010", "2012")
+# asheville_2013 <- water_scrape("01-11-010", "2013")
+# asheville_2014 <- water_scrape("01-11-010", "2014")
+# asheville_2015 <- water_scrape("01-11-010", "2015")
+# asheville_2016 <- water_scrape("01-11-010", "2016")
+# asheville_2017 <- water_scrape("01-11-010", "2017")
+# asheville_2018 <- water_scrape("01-11-010", "2018")
+# asheville_2019 <- water_scrape("01-11-010", "2019")
+
+# making the data frame
+# using the functions inside the data frame to prevent creation of 10 other frames
+asheville_water <- rbind(water_scrape("01-11-010", "2010"), water_scrape("01-11-010", "2011"), 
+                         water_scrape("01-11-010", "2012"), water_scrape("01-11-010", "2013"),
+                         water_scrape("01-11-010", "2014"), water_scrape("01-11-010", "2015"), 
+                         water_scrape("01-11-010", "2016"), water_scrape("01-11-010", "2017"),
+                         water_scrape("01-11-010", "2018"), water_scrape("01-11-010", "2019"))
+
+asheville_graph <- ggplot(data = asheville_water, aes(x = date, y = mgd)) +
+  geom_smooth(formula = y ~ x, method="loess",se=FALSE,color = "firebrick")+
+  geom_line() + 
+  geom_point() + 
+  labs(y = "Maximum monthly withdrawals (MGD)", x = "Month", title = "Monthly Maximum Daily Withdrawal from 2010 to 2019") +
+  theme(legend.title = element_blank(), legend.position = "bottom")
+asheville_graph
 
 ```
 
->Question: Just by looking at the plot (i.e. not running statistics), does Asheville have a trend in water usage over time?
+Question: Just by looking at the plot (i.e. not running statistics), does Asheville have a trend in water usage over time?
+
+>> Answer: Yes, if one just looks at the plot it appears that recently there has been an increase in water usage since around 2017 in Asheville. Before that the water usage appears to have remained relatively constant. 
