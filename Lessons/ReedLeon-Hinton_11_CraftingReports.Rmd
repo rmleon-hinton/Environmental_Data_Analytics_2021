@@ -65,6 +65,13 @@ See: <https://rmarkdown.rstudio.com> and class recording.
 
 <Fill in our discussion below with bullet points. Use italics and bold for emphasis (hint: use the cheat sheets or `Help` →`Markdown Quick Reference` to figure out how to make bold and italic text).> 
 
+*This assignment seems interesting and useful.*
+
+* Create **clean** outputs to send to others or work on collaboratively
+* Sends the code to the console all at once
+* Relatively easy user interface
+* Records both the code and the results to run it from beginning again and again. 
+
 
 ## TEXT EDITING CHALLENGE
 
